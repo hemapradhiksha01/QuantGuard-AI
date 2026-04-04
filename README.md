@@ -84,6 +84,27 @@ A rule-based guardrail filters responses before they are returned.
 This layer simulates how production systems enforce safety constraints on top of model outputs.
 
 ---
+## Model Setup
+
+The GGUF model is not included in this repository due to file size limits.
+
+Download the model from Hugging Face:
+
+https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-GGUF
+
+Download a file such as:
+
+tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
+
+Place the file inside the following folder:
+
+models/
+
+Make sure the final path looks like:
+
+models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
+
+---
 
 ## Running the Project
 
