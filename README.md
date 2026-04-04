@@ -1,114 +1,253 @@
-# QuantGuard-AI
-
-QuantGuard-AI is a lightweight evaluation framework for analyzing large language models (LLMs) across performance, safety, and deployment configurations. The project focuses on understanding how models behave under normal usage as well as adversarial conditions, and how system-level safeguards can improve reliability.
-
----
+# QuantGuard-AI: LLM Routing, Safety, and Quantization Evaluation System
 
 ## Overview
 
-This project compares two versions of the same model:
+This project implements a system for evaluating and managing large language models under real-world constraints. It focuses on three core challenges:
 
-- A standard FP16 model using the Hugging Face Transformers library
-- A quantized GGUF model running through llama.cpp
+* Model performance (accuracy)
+* System efficiency (latency and resource usage)
+* Safety under adversarial inputs (jailbreak and prompt injection)
 
-The evaluation pipeline measures:
-
-- Accuracy on simple question-answer tasks
-- Latency (response time)
-- Model behavior under adversarial prompts
-  - Jailbreak attempts
-  - Prompt injection attacks
-- Effectiveness of a guardrail layer in preventing unsafe outputs
+The system dynamically routes requests across multiple model variants and measures trade-offs between quantized and full-precision models using a real benchmark dataset.
 
 ---
 
-## Motivation
+## Key Features
 
-In practice, evaluating language models requires more than checking accuracy. Models are often exposed to unpredictable or malicious inputs, and their behavior can change under different deployment settings such as quantization.
-
-This project was built to explore three key questions:
-
-- How reliable is the model under normal usage?
-- How does it behave when exposed to adversarial prompts?
-- Does quantization affect performance, response quality, or safety?
+* Dynamic model routing based on input complexity and risk
+* Evaluation on a real dataset (TruthfulQA)
+* Comparison of quantized (GGUF) and full-precision (FP16) models
+* Guardrail layer to detect and block unsafe outputs
+* End-to-end metrics collection (accuracy, latency, model usage)
+* CSV-based logging for analysis
 
 ---
 
-## Project Structure
+## System Architecture
 
+The system processes each request through the following stages:
 
+Input → Prompt Classification → Routing Engine → Model Selection → Guardrail → Output
+
+### Components
+
+* **Prompt Classification**
+
+  * Identifies whether a request is simple, complex, or adversarial
+
+* **Routing Engine**
+
+  * Selects the appropriate model based on classification
+
+* **Model Layer**
+
+  * FP16 model for higher-quality responses
+  * GGUF quantized model for faster inference
+
+* **Guardrail Layer**
+
+  * Filters unsafe or malicious outputs
+
+* **Evaluation Layer**
+
+  * Computes accuracy, latency, and safety metrics
+
+---
+
+## Models Used
+
+* Full-precision model:
+
+  * TinyLlama 1.1B (FP16 via Hugging Face)
+
+* Quantized model:
+
+  * TinyLlama GGUF (Q4_K_M via llama.cpp)
+
+The quantized model runs significantly faster but may produce less reliable outputs for complex queries.
+
+---
+
+## Dataset
+
+The system uses the TruthfulQA dataset from Hugging Face.
+
+This dataset is designed to evaluate whether models produce truthful answers or repeat common misconceptions.
+
+---
+
+## Evaluation Metrics
+
+### Accuracy
+
+A keyword-based matching approach is used to evaluate correctness.
+
+This avoids strict string matching and better captures semantic correctness in model responses.
+
+---
+
+### Latency
+
+Measured per request:
+
+* GGUF model: ~0.25 seconds
+* FP16 model: ~1.7 seconds
+
+---
+
+### Safety
+
+Two types of adversarial behavior are evaluated:
+
+* Jailbreak attempts
+* Prompt injection attacks
+
+The guardrail layer detects and blocks unsafe outputs.
+
+---
+
+## Results and Insights
+
+### Accuracy
+
+The system achieved approximately 72% accuracy on a subset of the TruthfulQA dataset.
+
+This demonstrates:
+
+* Small models can answer simple questions correctly
+* Complex or misleading questions still lead to incorrect or hallucinated responses
+
+---
+
+### Quantization Trade-offs
+
+* GGUF model provides low latency (~0.25s)
+* FP16 model provides higher-quality responses (~1.7s)
+
+Quantization improves performance but reduces factual reliability.
+
+---
+
+### Routing Behavior
+
+Model usage distribution:
+
+* FP16: ~22 requests
+* GGUF: ~28 requests
+
+This shows that the system dynamically selects models based on input characteristics.
+
+---
+
+### Latency vs Quality Trade-off
+
+* Routing average latency: ~0.88s
+* GGUF-only baseline: ~0.25s
+
+Routing increases latency but improves response quality for complex queries.
+
+---
+
+### Safety Observations
+
+* Both models are vulnerable to adversarial prompts
+* Guardrails successfully block unsafe outputs
+
+This highlights the need for safety layers in production systems.
+
+---
+
+### Key Takeaway
+
+This project demonstrates that:
+
+* Quantization improves speed but reduces reliability
+* A single model is not sufficient for all tasks
+* Intelligent routing is required to balance cost, latency, and quality
+* Guardrails are essential for safe deployment of LLM systems
+
+---
+
+## Setup Instructions
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/hemapradhiksha01/QuantGuard-AI.git
+cd QuantGuard-AI
 ```
-QuantGuard-AI/
-│
-├── runner/
-│   └── run_pipeline.py       # Main evaluation pipeline
-│
-├── data/
-│   └── prompts.py            # QA, jailbreak, and injection prompts
-│
-├── models/
-│   └── *.gguf                # Quantized GGUF model
-│
-├── outputs/
-│   └── results.csv           # Evaluation results
-│
-├── requirements.txt
-└── README.md
+
+---
+
+### 2. Install dependencies
+
+```bash
+pip3 install -r requirements.txt
 ```
 
 ---
 
-## How It Works
+### 3. Download GGUF model
 
-The pipeline runs the same set of prompts on both models and records the results.
+The model is not included due to size limits.
 
-### 1. QA Evaluation
-The model answers simple questions.  
-Accuracy and latency are measured to establish a baseline.
-
-### 2. Jailbreak Testing
-Prompts attempt to force the model to generate unsafe outputs (for example, instructions for harmful actions).  
-The system checks whether:
-- The model produces unsafe content
-- The guardrail successfully blocks it
-
-### 3. Prompt Injection Testing
-Prompts attempt to override instructions or extract sensitive information.  
-The system evaluates:
-- Whether the model follows the malicious intent
-- Whether the response contains unsafe or irrelevant behavior
-- Whether the guardrail intervenes
-
-### 4. Guardrail Layer
-A rule-based guardrail filters responses before they are returned.  
-This layer simulates how production systems enforce safety constraints on top of model outputs.
-
----
-## Model Setup
-
-The GGUF model is not included in this repository due to file size limits.
-
-Download the model from Hugging Face:
+Download from:
 
 https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-GGUF
 
-Download a file such as:
+Place the file inside:
 
-tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
-
-Place the file inside the following folder:
-
+```
 models/
-
-Make sure the final path looks like:
-
-models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
+```
 
 ---
 
-## Running the Project
-
-Install dependencies:
+### 4. Run the pipeline
 
 ```bash
-pip install -r requirements.txt
+python3 runner/run_pipeline.py
+```
+
+---
+
+## Output
+
+Results are saved in:
+
+```
+outputs/results.csv
+```
+
+This file includes:
+
+* Prompt
+* Model used
+* Response
+* Accuracy
+* Latency
+* Safety indicators
+
+---
+
+## Future Improvements
+
+* Add GPTQ / AWQ model variants for deeper quantization comparison
+* Use embedding-based similarity for more accurate evaluation
+* Introduce confidence-based routing decisions
+* Add batching and async inference for scalability
+* Extend dataset coverage beyond TruthfulQA
+
+---
+
+## Summary
+
+This project simulates how production LLM systems operate under real constraints by combining:
+
+* Model routing
+* Quantization-aware inference
+* Safety filtering
+* Benchmark-driven evaluation
+
+It highlights the practical trade-offs required to build reliable and efficient AI systems.
+
