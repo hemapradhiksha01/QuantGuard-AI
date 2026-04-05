@@ -1,6 +1,6 @@
 # QuantGuard-AI
 
-QuantGuard-AI is a lightweight evaluation pipeline for comparing different LLM variants across latency, accuracy, and safety.
+QuantGuard-AI is a evaluation pipeline for comparing different LLM variants across latency, accuracy, and safety.
 
 ---
 
