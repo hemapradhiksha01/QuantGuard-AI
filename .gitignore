@@ -3,5 +3,4 @@ __pycache__/
 .env
 .DS_Store
 models/*.gguf
-outputs/*
-!outputs/sample_results.csv
+outputs/results_*.csv
