@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.env
+.DS_Store
+models/*.gguf
+outputs/results_*.csv
