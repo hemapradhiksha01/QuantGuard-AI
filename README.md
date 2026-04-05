@@ -2,6 +2,17 @@
 
 QuantGuard-AI is a evaluation pipeline for comparing different LLM variants across latency, accuracy, and safety.
 
+The system runs multiple model configurations — including FP16 (baseline), INT8 (fallback on non-CUDA environments), and GGUF (quantized via llama.cpp) — on a shared dataset of normal and adversarial prompts. For each input, the pipeline first applies a rule-based safety check to detect prompt injection or unsafe patterns and blocks execution if necessary.
+
+For safe prompts, all models are executed, and their responses are evaluated using a combination of:
+
+semantic similarity (sentence embeddings)
+numeric matching for factual answers
+basic keyword validation
+
+The pipeline records per-model latency and accuracy, aggregates results, and outputs a comparison summary showing trade-offs between performance and efficiency.
+
+This setup enables practical benchmarking of how model compression impacts inference speed and response quality while ensuring unsafe inputs are filtered before execution.
 ---
 
 ## Goal
