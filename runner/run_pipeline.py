@@ -247,6 +247,14 @@ def run_pipeline():
 
         correct += acc
 
+        all_results.append({
+        	"type": "qa",
+   		 "model_used": model_used,
+   		 "prompt": question,
+   		 "response": response,
+    		 "accuracy": acc,
+    		 "latency": latency
+	})
         print("Q:", question)
         print("Model Used:", model_used)
         print("A:", response)
@@ -282,3 +290,25 @@ for model, count in model_usage.items():
 
 latency_improvement = avg_latency_baseline - avg_latency_routing
 print(f"\nLatency Difference: {round(latency_improvement, 3)} seconds")
+# -------------------------
+# SAVE RESULTS TO CSV
+# -------------------------
+
+if not os.path.exists("outputs"):
+    os.makedirs("outputs")
+
+file_path = f"outputs/results_{int(time.time())}.csv"
+
+with open(file_path, "w", newline="") as file:
+    writer = csv.DictWriter(file, fieldnames=[
+        "type",
+        "model_used",
+        "prompt",
+        "response",
+        "accuracy",
+        "latency"
+    ])
+    writer.writeheader()
+    writer.writerows(all_results)
+
+print(f"\nResults saved to {file_path}")
