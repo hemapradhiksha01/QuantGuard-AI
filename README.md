@@ -131,18 +131,12 @@ Update the model path in run_pipeline.py if needed.
 python3 runner/run_pipeline.py
 ```
 Output
-Per-prompt responses for all models
-Latency and accuracy metrics
-Safety filtering logs
-Final model comparison
-Recommended model based on selected mode
-CSV output stored in:
+- Per-prompt responses for all models
+- Latency and accuracy metrics
+- Safety filtering logs
+- Final model comparison
+- Recommended model based on selected mode
+- CSV output stored in:
+```
 outputs/
-
-##Key Takeaways
-FP16 models provide higher accuracy but slower inference
-GGUF models provide significantly lower latency but may produce incorrect responses
-INT8 behaves similar to FP16 in non-CUDA environments due to fallback
-Safety layer prevents unsafe prompts from reaching the model
-Dataset quality directly affects evaluation reliability
-Model selection depends on deployment requirements (latency vs accuracy)
+```
