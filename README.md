@@ -1,26 +1,13 @@
 # QuantGuard-AI
-
-QuantGuard-AI is a evaluation pipeline for comparing different LLM variants across latency, accuracy, and safety.
-
-The system runs multiple model configurations — including FP16 (baseline), INT8 (fallback on non-CUDA environments), and GGUF (quantized via llama.cpp) — on a shared dataset of normal and adversarial prompts. For each input, the pipeline first applies a rule-based safety check to detect prompt injection or unsafe patterns and blocks execution if necessary.
-
-For safe prompts, all models are executed, and their responses are evaluated using a combination of:
-
-semantic similarity (sentence embeddings)
-numeric matching for factual answers
-basic keyword validation
-
-The pipeline records per-model latency and accuracy, aggregates results, and outputs a comparison summary showing trade-offs between performance and efficiency.
-
-This setup enables practical benchmarking of how model compression impacts inference speed and response quality while ensuring unsafe inputs are filtered before execution.
+This system evaluates multiple LLM variants and automatically recommends the best model for deployment based on performance, accuracy, and safety trade-offs.
 ---
 
 ## Goal
 
-Build a simple system to compare how different model variants perform under:
+To simulate a real-world deployment scenario where multiple LLM variants are evaluated and the system automatically recommends the most suitable model based on:
 
-- Latency (inference speed)
-- Accuracy (semantic correctness)
+- Performance (latency)
+- Response quality (accuracy)
 - Safety (handling adversarial prompts)
 
 ---
@@ -30,28 +17,29 @@ Build a simple system to compare how different model variants perform under:
 - **FP16 (Hugging Face Transformer)**
   - Baseline model
   - Higher latency
-  - Higher accuracy
+  - More consistent responses
 
-- **INT8 (Transformers - attempted)**
-  - Uses `load_in_8bit=True`
-  - Falls back to FP16 on non-CUDA environments
+- **INT8 (Transformers - fallback)**
+  - Attempted using `load_in_8bit=True`
+  - Falls back to FP16 on non-CUDA environments (Mac)
 
-- **GGUF (llama.cpp)**
-  - Quantized model
+- **GGUF (llama.cpp quantized model)**
+  - CPU-friendly quantized model
   - Very low latency
-  - Lower accuracy in some cases
+  - Lower accuracy on complex tasks
 
 ---
-
 ## Pipeline Overview
 
-1. Load dataset (normal + attack prompts)
+1. Load dataset containing:
+   - Normal prompts
+   - Adversarial prompts (prompt injection / unsafe inputs)
 
-2. Safety check:
-   - Detect prompt injection / unsafe patterns
+2. Safety Check:
+   - Detect unsafe patterns (e.g., system override, credential access)
    - Block execution if unsafe
 
-3. For safe prompts:
+3. Model Execution (for safe prompts):
    - Run all models:
      - FP16
      - INT8
@@ -60,29 +48,59 @@ Build a simple system to compare how different model variants perform under:
      - Response
      - Latency
 
-4. Accuracy calculation:
-   - Numeric match (for numeric answers)
+4. Accuracy Evaluation:
+   - Numeric matching (for factual answers)
    - Semantic similarity (sentence embeddings)
-   - Basic keyword matching
+   - Keyword-based validation
 
-5. Store results:
-   - Console output
-   - CSV file in `outputs/`
-
-6. Aggregation:
+5. Aggregation:
    - Average latency per model
    - Average accuracy per model
    - Safety block rate
 
+6. Model Recommendation:
+   - Select best model based on user-defined mode
+
 ---
 
-## Key Takeaways
+## Deployment Modes
 
-- FP16 provides more stable and accurate responses but is slower
-- GGUF is significantly faster but may produce incorrect or hallucinated answers
-- INT8 behaves similar to FP16 in this setup due to fallback on Mac (no CUDA)
-- Safety layer successfully blocks adversarial prompts before model execution
-- Dataset quality directly impacts evaluation reliability
+The system supports three modes:
+
+- **low_latency**
+  - Selects fastest model
+
+- **high_accuracy**
+  - Selects most accurate model
+
+- **balanced**
+  - Selects model based on accuracy-to-latency tradeoff
+
+---
+
+## Demo (User Interaction)
+
+### Mode Selection
+
+The system prompts the user to choose a deployment mode:
+
+![Mode Input](images/mode_input.png)
+
+---
+
+### Model Recommendation
+
+Based on the selected mode, the system evaluates all models and recommends the best option:
+
+![Model Recommendation](images/recommendation.png)
+
+---
+
+## Example Behavior
+
+- `low_latency` → GGUF selected (fastest)
+- `high_accuracy` → FP16 selected (most accurate)
+- `balanced` → model selected based on efficiency score
 
 ---
 
@@ -93,6 +111,8 @@ Build a simple system to compare how different model variants perform under:
 ```bash
 git clone https://github.com/hemapradhiksha01/QuantGuard-AI.git
 cd QuantGuard-AI
+```
+
 2. Install dependencies
 pip install -r requirements.txt
 pip install sentence-transformers llama-cpp-python
@@ -102,17 +122,22 @@ Place your .gguf model inside:
 
 models/
 
-Update path in run_pipeline.py if needed.
+Update the model path in run_pipeline.py if needed.
 
 4. Run pipeline
 python3 runner/run_pipeline.py
 Output
-Per-prompt model responses
-Latency and accuracy logs
-Final comparison summary
-CSV results stored in:
+Per-prompt responses for all models
+Latency and accuracy metrics
+Safety filtering logs
+Final model comparison
+Recommended model based on selected mode
+CSV output stored in:
 outputs/
-Notes
-INT8 requires CUDA for real quantization; falls back on Mac
-Accuracy is approximate and based on semantic similarity + rules
-GGUF models run via llama.cpp for CPU-friendly inference
+Key Takeaways
+FP16 models provide higher accuracy but slower inference
+GGUF models provide significantly lower latency but may produce incorrect responses
+INT8 behaves similar to FP16 in non-CUDA environments due to fallback
+Safety layer prevents unsafe prompts from reaching the model
+Dataset quality directly affects evaluation reliability
+Model selection depends on deployment requirements (latency vs accuracy)
