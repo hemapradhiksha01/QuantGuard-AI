@@ -113,19 +113,23 @@ git clone https://github.com/hemapradhiksha01/QuantGuard-AI.git
 cd QuantGuard-AI
 ```
 
-2. Install dependencies
+### 2. Install dependencies
+```bash
 pip install -r requirements.txt
 pip install sentence-transformers llama-cpp-python
-3. Add GGUF model
+```
+### 3. Add GGUF model
 
 Place your .gguf model inside:
-
+```
 models/
-
+```
 Update the model path in run_pipeline.py if needed.
 
-4. Run pipeline
+### 4. Run pipeline
+```
 python3 runner/run_pipeline.py
+```
 Output
 Per-prompt responses for all models
 Latency and accuracy metrics
@@ -134,7 +138,8 @@ Final model comparison
 Recommended model based on selected mode
 CSV output stored in:
 outputs/
-Key Takeaways
+
+##Key Takeaways
 FP16 models provide higher accuracy but slower inference
 GGUF models provide significantly lower latency but may produce incorrect responses
 INT8 behaves similar to FP16 in non-CUDA environments due to fallback
