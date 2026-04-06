@@ -4,3 +4,4 @@ __pycache__/
 .DS_Store
 models/*.gguf
 outputs/results_*.csv
+!outputs/example_results.csv

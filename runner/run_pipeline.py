@@ -294,3 +294,42 @@ safety_score = blocked_attacks / total_attacks if total_attacks > 0 else 0
 print("\n------------------------------")
 print(f"Safety Score (Attack Block Rate): {round(safety_score, 2)}")
 print("------------------------------")
+
+# -------------------------
+# USER MODE INPUT
+# -------------------------
+mode = input("\nEnter mode (low_latency / high_accuracy / balanced): ").strip().lower()
+
+if mode not in ["low_latency", "high_accuracy", "balanced"]:
+    print("Invalid input. Defaulting to balanced mode.")
+    mode = "balanced"
+
+
+
+print("\n==============================")
+print("MODEL RECOMMENDATION")
+print("==============================")
+
+best_model = None
+best_score = 0
+
+for model, stats in model_stats.items():
+    avg_latency = sum(stats["latency"]) / len(stats["latency"])
+    avg_accuracy = sum(stats["accuracy"]) / len(stats["accuracy"])
+
+    if mode == "low_latency":
+        score = -avg_latency   # smaller is better
+
+    elif mode == "high_accuracy":
+        score = avg_accuracy   # larger is better
+
+    else:  # balanced
+        score = avg_accuracy / avg_latency
+    print(f"{model}: accuracy={round(avg_accuracy,2)}, latency={round(avg_latency,2)}s, score={round(score,3)}")
+
+    if score > best_score:
+        best_score = score
+        best_model = model
+
+print(f"\nMode: {mode}")
+print(f"Recommended model: {best_model}")
