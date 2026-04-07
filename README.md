@@ -1,6 +1,6 @@
 # QuantGuard-AI
-Module 1: This system evaluates multiple LLM variants and automatically recommends the best model for deployment based on performance, accuracy, and safety trade-offs.
-Module 2: Model Optimization (FP16 → INT8 Quantization. 
+### Module 1: This system evaluates multiple LLM variants and automatically recommends the best model for deployment based on performance, accuracy, and safety trade-offs.
+### Module 2: Model Optimization (FP16 → INT8 Quantization. 
 This project includes a separate optimization step demonstrating how a standard FP16 model is converted into an INT8 model using ONNX Runtime.
 ---
 
@@ -173,3 +173,9 @@ quantize_dynamic(
 - FP16 latency: ~0.28s  
 - INT8 latency: ~0.03s  
 - Speedup: ~9x  
+---
+### Notebook (Step-by-Step Quantization)
+
+A complete walkthrough of FP16 → INT8 quantization is available here:
+
+`models/quantization/FP16ToINT8.ipynb`
