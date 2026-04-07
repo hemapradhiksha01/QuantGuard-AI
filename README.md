@@ -1,5 +1,7 @@
 # QuantGuard-AI
-This system evaluates multiple LLM variants and automatically recommends the best model for deployment based on performance, accuracy, and safety trade-offs.
+Module 1: This system evaluates multiple LLM variants and automatically recommends the best model for deployment based on performance, accuracy, and safety trade-offs.
+Module 2: Model Optimization (FP16 → INT8 Quantization. 
+This project includes a separate optimization step demonstrating how a standard FP16 model is converted into an INT8 model using ONNX Runtime.
 ---
 
 ## Goal
@@ -11,7 +13,7 @@ To simulate a real-world deployment scenario where multiple LLM variants are eva
 - Safety (handling adversarial prompts)
 
 ---
-
+## Module 1
 ## Models Used
 
 - **FP16 (Hugging Face Transformer)**
@@ -19,8 +21,10 @@ To simulate a real-world deployment scenario where multiple LLM variants are eva
   - Higher latency
   - More consistent responses
 
-- **INT8 (Transformers - fallback)**
-  - Attempted using `load_in_8bit=True`
+- **INT8 (ONNX Dynamic Quantization)**
+  - Reduced precision (8-bit)
+  - Optimized for faster inference and smaller size
+  - Also Attempted using `load_in_8bit=True`
   - Falls back to FP16 on non-CUDA environments (Mac)
 
 - **GGUF (llama.cpp quantized model)**
@@ -140,3 +144,32 @@ Output
 ```
 outputs/
 ```
+---
+
+## Module 2
+## Quantization Process
+
+1. Load pretrained FP16 model  
+2. Export model to ONNX format  
+3. Apply **dynamic INT8 quantization**  
+4. Run inference on both FP16 and INT8 versions  
+5. Compare latency and output behavior 
+
+---
+
+## Code Snippet (Core Step)
+
+```python
+from onnxruntime.quantization import quantize_dynamic, QuantType
+
+quantize_dynamic(
+    model_input="onnx_model/model.onnx",
+    model_output="quantized_model.onnx",
+    weight_type=QuantType.QInt8
+)
+```
+---
+## Quantization Results
+- FP16 latency: ~0.28s  
+- INT8 latency: ~0.03s  
+- Speedup: ~9x  
