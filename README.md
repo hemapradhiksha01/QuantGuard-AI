@@ -6,6 +6,7 @@ Module 2: Model Optimization (FP16 → INT8 Quantizatio)
 
 This project includes a separate optimization step demonstrating how a standard FP16 model is converted into an INT8 model using ONNX Runtime.
 
+Module 3: LLM Inference System
 ---
 
 ## Goal
@@ -183,3 +184,13 @@ quantize_dynamic(
 A complete walkthrough of FP16 → INT8 quantization is available here:
 
 `models/quantization/FP16ToINT8.ipynb`
+---
+## Module 3: LLM Inference System
+
+Built a production-style LLM inference pipeline with:
+
+- Guardrail ML classifier (98% accuracy)
+- Multi-tier safety (allow / review / block)
+- Model routing (TinyLlama + Mistral 7B)
+- Quantization (4-bit)
+- FastAPI deployment
